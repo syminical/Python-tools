@@ -27,7 +27,7 @@ try:
       for line in inFile:
         line = line[:-1] # remove \n
         outFile.write(f'{line} ---- {get_code(line)}\n')
-except Exception: # I could not find a clean way to tell the user /which/ file.
+except: # I could not find a clean way to tell the user /which/ file.
   print('\n-- The operation was unsuccessful. Please check the file access.')
 else: # print if no exceptions
   print('\n-- List checked. Written to: %s' % ask_write)
