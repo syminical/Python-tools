@@ -5,36 +5,29 @@
 # -- Enjoy and feedback is welcome. --
 import requests
 
+def get_code(url):
+  try:
+    return requests.get(url).status_code
+  except requests.ConnectionError:
+    return 'Connection Error'
+
+
+
 # Read from
 ask_read = input('Domain list file: ')
-sub_list = open(ask_read,'r')
-split_list = sub_list.read().splitlines()
 
 # Write to
 ask_write = input('Status list name (will create if does not exist): ')
-stat_list = open(ask_write,'a')
 
-def get_code(url):
-    try:
-        get = requests.get(url)
-        stat_code = str(get.status_code)
-        return stat_code
-    
-    except requests.ConnectionError:
-        return 'Connection Error'
-
-def write_list(url, code):
-    stat_list.write(url + ' ---- ' + code + '\n')
-
-def main(list):
-    
-    for line in list:
-        write_list(line, get_code(line))
-
-    sub_list.close()
-    stat_list.close()
-    
-    print('-- List checked. Written to: %s' % ask_write)
-
-
-main(split_list)
+# exception bandaids, and context management for safer file closing
+try:
+  with open(ask_read, 'r') as inFile: 
+    with open(ask_write, 'a') as outFile:
+      # work line-by-line in case of large files
+      for line in inFile:
+        line = line[:-1] # remove \n
+        outFile.write(f'{line} ---- {get_code(line)}\n')
+except Exception: # I could not find a clean way to tell the user /which/ file.
+  print('\n-- The operation was unsuccessful. Please check the file access.')
+else: # print if no exceptions
+  print('\n-- List checked. Written to: %s' % ask_write)
